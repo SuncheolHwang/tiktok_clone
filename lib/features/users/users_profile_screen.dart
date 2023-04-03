@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tiktok_clone/constants/sizes.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -13,8 +14,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          snap: true,
-          floating: true,
           pinned: true,
           stretch: true,
           backgroundColor: Colors.teal,
@@ -33,6 +32,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             title: const Text('Hello!'),
           ),
         ),
+        SliverToBoxAdapter(
+          child: Column(
+            children: const [
+              CircleAvatar(
+                backgroundColor: Colors.red,
+                radius: 20,
+              )
+            ],
+          ),
+        ),
         SliverFixedExtentList(
           delegate: SliverChildBuilderDelegate(
             childCount: 50,
@@ -46,7 +55,61 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
           itemExtent: 100,
         ),
+        SliverPersistentHeader(
+          delegate: CustomDelgate(),
+          pinned: true,
+        ),
+        SliverGrid(
+          delegate: SliverChildBuilderDelegate(
+            childCount: 50,
+            (context, index) => Container(
+              color: Colors.blue[100 * (index % 9)],
+              child: Align(
+                alignment: Alignment.center,
+                child: Text('Item $index'),
+              ),
+            ),
+          ),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 100,
+            mainAxisSpacing: Sizes.size20,
+            crossAxisSpacing: Sizes.size20,
+            childAspectRatio: 1,
+          ),
+        ),
       ],
     );
+  }
+}
+
+class CustomDelgate extends SliverPersistentHeaderDelegate {
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Colors.indigo,
+      child: const FractionallySizedBox(
+        heightFactor: 1,
+        child: Center(
+          child: Text(
+            'Title!!!!',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 150;
+
+  @override
+  double get minExtent => 80;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
   }
 }

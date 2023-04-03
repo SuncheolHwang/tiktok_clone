@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
-import 'package:tiktok_clone/features/onboarding/videos/inbox/chat_detail_screen.dart';
+import 'package:tiktok_clone/features/inbox/chat_detail_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
