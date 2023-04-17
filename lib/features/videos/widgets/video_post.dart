@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tiktok_clone/constants/gaps.dart';
 import 'package:tiktok_clone/constants/sizes.dart';
 import 'package:tiktok_clone/features/videos/widgets/video_button.dart';
 import 'package:tiktok_clone/features/videos/widgets/video_comments.dart';
+import 'package:tiktok_clone/generated/l10n.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -39,6 +41,8 @@ class _VideoPostState extends State<VideoPost>
   final text =
       'This is my house in Thiland!!! This is my house in Thiland!!! This is my house in Thiland!!! This is my house in Thiland!!!';
 
+  double _volume = 0;
+
   void _onVideoChange() {
     if (_videoPlayerController.value.isInitialized) {
       if (_videoPlayerController.value.duration ==
@@ -51,6 +55,9 @@ class _VideoPostState extends State<VideoPost>
   void _initVideoPlayer() async {
     await _videoPlayerController.initialize();
     await _videoPlayerController.setLooping(true);
+    if (kIsWeb) {
+      await _videoPlayerController.setVolume(0);
+    }
     _videoPlayerController.addListener(_onVideoChange);
     setState(() {});
   }
@@ -79,6 +86,10 @@ class _VideoPostState extends State<VideoPost>
   }
 
   void _onVisibilityChanged(VisibilityInfo info) {
+    if (!mounted) {
+      return;
+    }
+
     if (info.visibleFraction == 1 &&
         !_isPause &&
         !_videoPlayerController.value.isPlaying) {
@@ -124,6 +135,12 @@ class _VideoPostState extends State<VideoPost>
       builder: (context) => const VideoComments(),
     );
     _onTogglePause();
+  }
+
+  void _onVolumeTap(TapDownDetails details) async {
+    _volume = details.localPosition.dx / Sizes.size64;
+    await _videoPlayerController.setVolume(_volume);
+    setState(() {});
   }
 
   @override
@@ -214,6 +231,62 @@ class _VideoPostState extends State<VideoPost>
                     )
                   ],
                 ),
+                if (kIsWeb) ...[
+                  Gaps.v10,
+                  IntrinsicHeight(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _volume = _volume == 0.0 ? 0.5 : 0.0;
+                            });
+                            _videoPlayerController.setVolume(_volume);
+                          },
+                          child: FaIcon(
+                            _volume == 0.0
+                                ? FontAwesomeIcons.volumeOff
+                                : FontAwesomeIcons.volumeHigh,
+                            color: Colors.white,
+                            size: Sizes.size20,
+                          ),
+                        ),
+                        const AbsorbPointer(
+                          absorbing: true,
+                          child: SizedBox(
+                            height: double.infinity,
+                            width: Sizes.size10,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTapDown: _onVolumeTap,
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            width: Sizes.size64,
+                            margin: const EdgeInsets.symmetric(
+                              vertical: Sizes.size3,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.white,
+                                width: Sizes.size1,
+                              ),
+                            ),
+                            child: FractionallySizedBox(
+                              widthFactor: _volume,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -232,16 +305,16 @@ class _VideoPostState extends State<VideoPost>
                   child: Text('니꼬'),
                 ),
                 Gaps.v24,
-                const VideoButton(
+                VideoButton(
                   icon: FontAwesomeIcons.solidHeart,
-                  text: '2.9M',
+                  text: S.of(context).likeCount(9890897),
                 ),
                 Gaps.v24,
                 GestureDetector(
                   onTap: () => _onCommentsTap(context),
-                  child: const VideoButton(
+                  child: VideoButton(
                     icon: FontAwesomeIcons.solidComment,
-                    text: '33K',
+                    text: S.of(context).commentCount(891589810),
                   ),
                 ),
                 Gaps.v24,
